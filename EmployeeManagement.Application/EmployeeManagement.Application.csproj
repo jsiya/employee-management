@@ -7,12 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="DTOs\EmployeeDTOs\" />
-      <Folder Include="Features\Employees\Commands\CreateEmployee\" />
-      <Folder Include="Features\Employees\Commands\DeleteEmployeeById\" />
-      <Folder Include="Features\Employees\Commands\UpdateEmployee\" />
-      <Folder Include="Features\Employees\Queries\GetAllEmployees\" />
-      <Folder Include="Features\Employees\Queries\GetEmployeeById\" />
       <Folder Include="Interfaces\Services\" />
     </ItemGroup>
 
