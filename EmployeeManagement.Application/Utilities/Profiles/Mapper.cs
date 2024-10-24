@@ -6,6 +6,8 @@ using EmployeeManagement.Application.Features.Companies.Commands.CreateCompany;
 using EmployeeManagement.Application.Features.Companies.Commands.UpdateCompanyById;
 using EmployeeManagement.Application.Features.Departments.Commands.CreateDepartment;
 using EmployeeManagement.Application.Features.Departments.Commands.UpdateDepartment;
+using EmployeeManagement.Application.Features.Employees.Commands.CreateEmployee;
+using EmployeeManagement.Application.Features.Employees.Commands.UpdateEmployee;
 using EmployeeManagement.Domain.Entities.Concretes;
 
 namespace EmployeeManagement.Application.Utilities.Profiles;
@@ -26,5 +28,8 @@ public class Mapper: Profile
         
         CreateMap<Employee, EmployeeDto>()
             .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department));
+        CreateMap<CreateEmployeeCommandRequest, Employee>();
+        CreateMap<UpdateEmployeeCommandRequest, Employee>();
+        
     }
 }

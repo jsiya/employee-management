@@ -4,5 +4,8 @@ namespace EmployeeManagement.Application.Features.Employees.Commands.CreateEmplo
 
 public class CreateEmployeeCommandRequest: IRequest
 {
-    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public DateTime BirthDate { get; set; }
+    public int DepartmentId { get; set; }
 }
