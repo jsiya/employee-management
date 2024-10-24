@@ -20,7 +20,7 @@ public class DepartmentController: ControllerBase
         _mediator = mediator;
     }
     
-    [HttpPost("departments")]
+    [HttpPost]
     public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommandRequest request)
     {
         await _mediator.Send(request);
@@ -52,7 +52,7 @@ public class DepartmentController: ControllerBase
         return Ok(departments);
     }
     
-    [HttpPut("departments/{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateDepartment(int id, [FromBody] UpdateDepartmentCommandRequest command)
     {
         if (id != command.Id)
@@ -64,7 +64,7 @@ public class DepartmentController: ControllerBase
         return NoContent(); 
     }
     
-    [HttpDelete("departments/{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteDepartment(int id)
     {
         await _mediator.Send(new DeleteDepartmentByIdCommandRequest() { Id = id });

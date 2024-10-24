@@ -20,29 +20,11 @@ public class CompanyController: ControllerBase
         _mediator = mediator;
     }
     
-    [HttpPost("companies")]
+    [HttpPost]
     public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyCommandRequest commandRequest)
     {
         var companyId = await _mediator.Send(commandRequest);
         return Ok();
-    }
-    [HttpDelete("companies/{id}")]
-    public async Task<IActionResult> DeleteCompany(int id)
-    {
-        await _mediator.Send(new DeleteCompanyByIdCommandRequest() { Id = id });
-        return NoContent();
-    }
-    
-    [HttpPut("companies/{id}")]
-    public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyCommandRequest command)
-    {
-        if (id != command.Id)
-        {
-            return BadRequest("Mismatched Company ID");
-        }
-
-        await _mediator.Send(command);
-        return NoContent(); 
     }
     
     [HttpGet("companies")]
@@ -67,4 +49,24 @@ public class CompanyController: ControllerBase
         var company = await _mediator.Send(query);
         return Ok(company);
     }
+    
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyCommandRequest command)
+    {
+        if (id != command.Id)
+        {
+            return BadRequest("Mismatched Company ID");
+        }
+
+        await _mediator.Send(command);
+        return NoContent(); 
+    }
+    
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteCompany(int id)
+    {
+        await _mediator.Send(new DeleteCompanyByIdCommandRequest() { Id = id });
+        return NoContent();
+    }
+    
 }
