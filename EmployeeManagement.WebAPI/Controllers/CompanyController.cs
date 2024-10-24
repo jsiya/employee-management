@@ -20,7 +20,7 @@ public class CompanyController: ControllerBase
         _mediator = mediator;
     }
     
-    [HttpPost]
+    [HttpPost("companies")]
     public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyCommandRequest commandRequest)
     {
         var companyId = await _mediator.Send(commandRequest);
@@ -50,7 +50,7 @@ public class CompanyController: ControllerBase
         return Ok(company);
     }
     
-    [HttpPut("{id:int}")]
+    [HttpPut("companies/{id:int}")]
     public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyCommandRequest command)
     {
         if (id != command.Id)
@@ -62,7 +62,7 @@ public class CompanyController: ControllerBase
         return NoContent(); 
     }
     
-    [HttpDelete("{id:int}")]
+    [HttpDelete("companies/{id:int}")]
     public async Task<IActionResult> DeleteCompany(int id)
     {
         await _mediator.Send(new DeleteCompanyByIdCommandRequest() { Id = id });

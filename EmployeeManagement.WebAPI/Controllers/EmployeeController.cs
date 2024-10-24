@@ -36,13 +36,13 @@ public class EmployeeController: ControllerBase
         return Ok();
     }
     
-    [HttpPut("{id:int}")]
+    [HttpPut("employees/{id:int}")]
     public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateEmployeeCommandRequest command)
     {
         return NoContent(); 
     }
     
-    [HttpDelete("{id:int}")]
+    [HttpDelete("employees/{id:int}")]
     public async Task<IActionResult> DeleteCompany(int id)
     {
         return NoContent();
