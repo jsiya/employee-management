@@ -7,15 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="DTOs\CompanyDTOs\" />
       <Folder Include="DTOs\DepartmentDTOs\" />
       <Folder Include="DTOs\EmployeeDTOs\" />
-      <Folder Include="Features\Companies\Commands\" />
-      <Folder Include="Features\Companies\Queries\" />
-      <Folder Include="Features\Departments\Commands\" />
-      <Folder Include="Features\Departments\Queries\" />
-      <Folder Include="Features\Employees\Commands\" />
-      <Folder Include="Features\Employees\Queries\" />
+      <Folder Include="Features\Companies\Queries\GetCompanyById\" />
+      <Folder Include="Features\Departments\Commands\CreateDepartment\" />
+      <Folder Include="Features\Departments\Commands\DeleteDepartmentByid\" />
+      <Folder Include="Features\Departments\Commands\UpdateDepartment\" />
+      <Folder Include="Features\Departments\Queries\GetAllDepartments\" />
+      <Folder Include="Features\Departments\Queries\GetDepartmentById\" />
+      <Folder Include="Features\Employees\Commands\CreateEmployee\" />
+      <Folder Include="Features\Employees\Commands\DeleteEmployeeById\" />
+      <Folder Include="Features\Employees\Commands\UpdateEmployee\" />
+      <Folder Include="Features\Employees\Queries\GetAllEmployees\" />
+      <Folder Include="Features\Employees\Queries\GetEmployeeById\" />
       <Folder Include="Interfaces\Services\" />
     </ItemGroup>
 
