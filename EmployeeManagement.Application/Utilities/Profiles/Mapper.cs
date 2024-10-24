@@ -1,7 +1,10 @@
 using AutoMapper;
 using EmployeeManagement.Application.DTOs.CompanyDTOs;
+using EmployeeManagement.Application.DTOs.DepartmentDTOs;
 using EmployeeManagement.Application.Features.Companies.Commands.CreateCompany;
 using EmployeeManagement.Application.Features.Companies.Commands.UpdateCompanyById;
+using EmployeeManagement.Application.Features.Departments.Commands.CreateDepartment;
+using EmployeeManagement.Application.Features.Departments.Commands.UpdateDepartment;
 using EmployeeManagement.Domain.Entities.Concretes;
 
 namespace EmployeeManagement.Application.Utilities.Profiles;
@@ -15,5 +18,11 @@ public class Mapper: Profile
 
         CreateMap<CreateCompanyCommandRequest, Company>();
         CreateMap<UpdateCompanyCommandRequest, Company>();
+
+        CreateMap<CreateDepartmentCommandRequest, Department>();
+        CreateMap<UpdateDepartmentCommandRequest, Department>();
+        CreateMap<Department, DepartmentDto>()
+            .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.Company.Id))
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.Name)); 
     }
 }
