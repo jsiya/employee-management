@@ -2,6 +2,7 @@ using EmployeeManagement.Application.DTOs.EmployeeDTOs;
 using EmployeeManagement.Application.Features.Employees.Commands.CreateEmployee;
 using EmployeeManagement.Application.Features.Employees.Commands.DeleteEmployeeById;
 using EmployeeManagement.Application.Features.Employees.Commands.UpdateEmployee;
+using EmployeeManagement.Application.Features.Employees.Queries.GetAllEmployees;
 using EmployeeManagement.Application.Features.Employees.Queries.GetEmployeeById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,14 +23,22 @@ public class EmployeeController: ControllerBase
     [HttpPost("employees")]
     public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeCommandRequest request)
     {
-        await _mediator.Send(request);
-        return Ok();
+        try
+        {
+            await _mediator.Send(request);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
     
     [HttpGet("employees")]
-    public async Task<ActionResult<List<EmployeeDto>>> GetEmployees([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<List<EmployeeDto>>> GetEmployees([FromQuery] GetAllEmployeesQueryRequest request)
     {
-        return Ok();
+        var employees = await _mediator.Send(request);
+        return Ok(employees);
     }
     
     [HttpGet("employees/{id:int}")]

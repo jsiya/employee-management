@@ -53,11 +53,6 @@ public class CompanyController: ControllerBase
     [HttpPut("companies/{id:int}")]
     public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyCommandRequest command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest("Mismatched Company ID");
-        }
-
         await _mediator.Send(command);
         return NoContent(); 
     }

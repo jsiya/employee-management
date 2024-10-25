@@ -23,8 +23,15 @@ public class DepartmentController: ControllerBase
     [HttpPost("departments")]
     public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommandRequest request)
     {
-        await _mediator.Send(request);
-        return Ok();
+        try
+        {
+            await _mediator.Send(request);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
     
     
@@ -40,15 +47,9 @@ public class DepartmentController: ControllerBase
     }
     
     [HttpGet("departments")]
-    public async Task<ActionResult<List<DepartmentDto>>> GetDepartments([FromQuery] int? companyId = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<List<DepartmentDto>>> GetDepartments([FromQuery] GetAllDepartmentsQueryRequest request)
     {
-        var query = new GetAllDepartmentsQueryRequest()
-        {
-            CompanyId = companyId,
-            Page = page,
-            PageSize = pageSize
-        };
-        var departments = await _mediator.Send(query);
+        var departments = await _mediator.Send(request);
         return Ok(departments);
     }
     

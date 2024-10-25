@@ -22,6 +22,15 @@ public class GetAllEmployeesQueryHandler: IRequestHandler<GetAllEmployeesQueryRe
         IEnumerable<Employee> employees;
         if ((request.CompanyId is not null) && (request.DepartmentId is not null))
         {
+            employees = await _employeeReadRepository.GetAllAsync(d =>
+                d.DepartmentId == request.DepartmentId && d.Department.CompanyId == request.CompanyId);
+        }
+        else if (request.CompanyId is not null)
+        {
+            employees = await _employeeReadRepository.GetAllAsync(d => d.Department.CompanyId == request.CompanyId);
+        }
+        else if (request.DepartmentId is not null)
+        {
             employees = await _employeeReadRepository.GetAllAsync(d => d.DepartmentId == request.DepartmentId);
         }
         else
