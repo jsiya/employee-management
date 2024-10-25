@@ -31,15 +31,17 @@ This project provides a backend API for managing employees, departments, and com
    git clone https://github.com/jsiya/employee-management.git
    cd employee-management
    
-2. Set up the database:
+2. Set up the database: 
+
    -Update the appsettings.json file with your SQL Server connection string.
+
    -Apply migrations to set up the database schema:
    ```bash
    dotnet ef database update
-3. Start the application:
+4. Start the application:
    ```bash
    dotnet run
-4. Access the API documentation by navigating to http://localhost:<port>/swagger.
+5. Access the API documentation by navigating to http://localhost:<port>/swagger.
 
 
 ## 📌 API Endpoints
@@ -89,6 +91,6 @@ To filter employees based on specific criteria, use query parameters:
     GET /api/employees?Page=1&PageSize=10
 ```
 
-**Combined Example**
+**Combined Example:**
 ```bash
 GET api/employees?CompanyId=9&Page=2&PageSize=10
