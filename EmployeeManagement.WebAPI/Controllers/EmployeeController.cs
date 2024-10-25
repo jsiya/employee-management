@@ -23,51 +23,67 @@ public class EmployeeController: ControllerBase
     [HttpPost("employees")]
     public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeCommandRequest request)
     {
-        try
+        var result = await _mediator.Send(request);
+
+        if (!result.Success)
         {
-            await _mediator.Send(request);
-            return Ok();
+            return BadRequest(new { message = result.Message });
         }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+
+        return CreatedAtAction(nameof(GetEmployeeById), new { id = result.Data }, new { message = "Employee created successfully." });
     }
+
     
     [HttpGet("employees")]
     public async Task<ActionResult<List<EmployeeDto>>> GetEmployees([FromQuery] GetAllEmployeesQueryRequest request)
     {
-        var employees = await _mediator.Send(request);
-        return Ok(employees);
+        var result = await _mediator.Send(request);
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+        return Ok(result);
     }
     
     [HttpGet("employees/{id:int}")]
-    public async Task<ActionResult<List<EmployeeDto>>> GetEmployeeById(int id)
+    public async Task<IActionResult> GetEmployeeById(int id)
     {
-        var query = new GetEmployeeByIdQueryRequest()
+        var query = new GetEmployeeByIdQueryRequest { Id = id };
+        var result = await _mediator.Send(query);
+        if (!result.Success)
         {
-            Id = id
-        };
-        var employee = await _mediator.Send(query);
-        return Ok(employee);
+            return NotFound(new { message = result.Message });
+        }
+
+        return Ok(result.Data);
     }
     
     [HttpPut("employees/{id:int}")]
-    public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateEmployeeCommandRequest command)
+    public async Task<IActionResult> UpdateEmployee(int id, [FromBody] UpdateEmployeeCommandRequest command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest("Mismatched Department ID");
+        if (id != command.Id) {
+            return BadRequest("Mismatched Employee ID");
         }
 
-        await _mediator.Send(command);
-        return NoContent(); 
+        var result = await _mediator.Send(command);
+        if (!result.Success)
+        {
+            return NotFound(new { message = result.Message });
+        }
+
+        return Ok(new { message = "Employee updated successfully.", employeeId = result.Data });
     }
+
     
     [HttpDelete("employees/{id:int}")]
-    public async Task<IActionResult> DeleteCompany(int id)
+    public async Task<IActionResult> DeleteEmployee(int id)
     {
-        await _mediator.Send(new DeleteEmployeeByIdCommandRequest() { Id = id });
-        return NoContent();
+        var result = await _mediator.Send(new DeleteEmployeeByIdCommandRequest { Id = id });
+        if (!result.Success){
+            return NotFound(new { message = result.Message });
+        }
+        
+        return Ok(new { message = "Employee deleted successfully.", employeeId = result.Data });
     }
+
 }

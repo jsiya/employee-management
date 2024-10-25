@@ -1,12 +1,13 @@
 using AutoMapper;
 using EmployeeManagement.Application.Interfaces.Repositories.Department;
 using EmployeeManagement.Application.Interfaces.Repositories.Employee;
+using EmployeeManagement.Application.Utilities.Responses;
 using EmployeeManagement.Domain.Entities.Concretes;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Employees.Commands.CreateEmployee;
 
-public class CreateEmployeeComandHandler: IRequestHandler<CreateEmployeeCommandRequest>
+public class CreateEmployeeComandHandler: IRequestHandler<CreateEmployeeCommandRequest, IDataResult<int>>
 {
     private readonly IEmployeeWriteRepository _employeeWriteRepository;
     private readonly IDepartmentReadRepository _departmentReadRepository;
@@ -19,23 +20,25 @@ public class CreateEmployeeComandHandler: IRequestHandler<CreateEmployeeCommandR
         _departmentReadRepository = departmentReadRepository;
     }
 
-    public async Task Handle(CreateEmployeeCommandRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<int>> Handle(CreateEmployeeCommandRequest request, CancellationToken cancellationToken)
     {
         try
         {
             var departmentExists = await _departmentReadRepository.GetAsync(d => d.Id == request.DepartmentId);
             if (departmentExists == null)
             {
-                throw new Exception($"Department with ID {request.DepartmentId} does not exist.");
+                return new ErrorDataResult<int>(0, $"Department with ID {request.DepartmentId} does not exist.");
             }
+
             var employee = _mapper.Map<Employee>(request);
             await _employeeWriteRepository.AddAsync(employee);
             await _employeeWriteRepository.SaveChangeAsync();
+
+            return new SuccessDataResult<int>(employee.Id, "Employee created successfully.");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine(e);
-            throw new Exception(e.Message);
+            return new ErrorDataResult<int>(0, $"An error occurred: {ex.Message}");
         }
     }
 }
