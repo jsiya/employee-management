@@ -1,11 +1,12 @@
 using AutoMapper;
 using EmployeeManagement.Application.DTOs.DepartmentDTOs;
 using EmployeeManagement.Application.Interfaces.Repositories.Department;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Departments.Queries.GetDepartmentById;
 
-public class GetDepartmentByIdQueryHandler: IRequestHandler<GetDepartmentByIdQueryRequest, GetDepartmentByIdQueryResponse>
+public class GetDepartmentByIdQueryHandler : IRequestHandler<GetDepartmentByIdQueryRequest, IDataResult<DepartmentDto>>
 {
     private readonly IMapper _mapper;
     private readonly IDepartmentReadRepository _departmentReadRepository;
@@ -16,13 +17,16 @@ public class GetDepartmentByIdQueryHandler: IRequestHandler<GetDepartmentByIdQue
         _mapper = mapper;
     }
 
-
-    public async Task<GetDepartmentByIdQueryResponse> Handle(GetDepartmentByIdQueryRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<DepartmentDto>> Handle(GetDepartmentByIdQueryRequest request, CancellationToken cancellationToken)
     {
         var department = await _departmentReadRepository.GetAsync(d => d.Id == request.Id);
-        return new GetDepartmentByIdQueryResponse()
+
+        if (department == null)
         {
-            Departments = _mapper.Map<DepartmentDto>(department)
-        };
+            return new ErrorDataResult<DepartmentDto>(null, "Department not found.");
+        }
+
+        var departmentDto = _mapper.Map<DepartmentDto>(department);
+        return new SuccessDataResult<DepartmentDto>(departmentDto, "Department retrieved successfully.");
     }
 }

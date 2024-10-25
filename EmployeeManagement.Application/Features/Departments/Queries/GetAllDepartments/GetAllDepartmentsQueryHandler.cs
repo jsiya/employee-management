@@ -20,6 +20,7 @@ public class GetAllDepartmentsQueryHandler: IRequestHandler<GetAllDepartmentsQue
     public async Task<GetAllDepartmentsQueryResponse> Handle(GetAllDepartmentsQueryRequest request, CancellationToken cancellationToken)
     {
         IEnumerable<Department> departments;
+
         if (request.CompanyId is not null)
         {
             departments = await _departmentReadRepository.GetAllAsync(d => d.CompanyId == request.CompanyId);
@@ -28,12 +29,20 @@ public class GetAllDepartmentsQueryHandler: IRequestHandler<GetAllDepartmentsQue
         {
             departments = await _departmentReadRepository.GetAllAsync();
         }
-        var departmentsForPage = departments.ToList()
-            .Skip((request.Page-1) * request.PageSize)
-            .Take(request.PageSize).ToList();
-        return new GetAllDepartmentsQueryResponse()
-        {
-            Departments = _mapper.Map<ICollection<DepartmentDto>>(departmentsForPage)
-        };
+
+        var totalCount = departments.Count();
+        var departmentsForPage = departments
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToList();
+
+        var departmentDtos = _mapper.Map<ICollection<DepartmentDto>>(departmentsForPage);
+
+        return new GetAllDepartmentsQueryResponse(
+            departmentDtos,
+            totalCount,
+            request.PageSize,
+            request.Page
+        );
     }
 }

@@ -1,3 +1,5 @@
+using EmployeeManagement.Application.DTOs.DepartmentDTOs;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Departments.Queries.GetAllDepartments;

@@ -52,7 +52,7 @@ public class CompanyController: ControllerBase
     [HttpGet("companies/{id:int}")]
     public async Task<ActionResult<List<CompanyDto>>> GetCompanyById(int id)
     {
-        var result = await _mediator.Send(new GetCompanyByIdQueryRequest { Id = id }) as IDataResult<CompanyDto>;
+        var result = await _mediator.Send(new GetCompanyByIdQueryRequest { Id = id });
 
         if (!result.Success)
         {

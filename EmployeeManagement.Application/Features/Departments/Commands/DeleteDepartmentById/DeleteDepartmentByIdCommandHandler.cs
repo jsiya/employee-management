@@ -1,9 +1,10 @@
 using EmployeeManagement.Application.Interfaces.Repositories.Department;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Departments.Commands.DeleteDepartmentById;
 
-public class DeleteDepartmentByIdCommandHandler: IRequestHandler<DeleteDepartmentByIdCommandRequest>
+public class DeleteDepartmentByIdCommandHandler: IRequestHandler<DeleteDepartmentByIdCommandRequest,  IDataResult<int>>
 {
     private readonly IDepartmentReadRepository _departmentReadRepository;
     private readonly IDepartmentWriteRepository _departmentWriteRepository;
@@ -14,13 +15,18 @@ public class DeleteDepartmentByIdCommandHandler: IRequestHandler<DeleteDepartmen
         _departmentReadRepository = departmentReadRepository;
     }
 
-    public async Task Handle(DeleteDepartmentByIdCommandRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<int>> Handle(DeleteDepartmentByIdCommandRequest request, CancellationToken cancellationToken)
     {
         var department = await _departmentReadRepository.GetAsync(c => c.Id == request.Id);
-        if (department is not null)
+        
+        if (department == null)
         {
-            _departmentWriteRepository.Remove(department);
-            await _departmentWriteRepository.SaveChangeAsync();
+            return new ErrorDataResult<int>(0, "Department not found.");
         }
+
+        _departmentWriteRepository.Remove(department);
+        await _departmentWriteRepository.SaveChangeAsync();
+
+        return new SuccessDataResult<int>(department.Id, "Department deleted successfully.");
     }
 }

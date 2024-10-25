@@ -23,34 +23,39 @@ public class DepartmentController: ControllerBase
     [HttpPost("departments")]
     public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommandRequest request)
     {
-        try
+        var result = await _mediator.Send(request);
+        if (!result.Success)
         {
-            await _mediator.Send(request);
-            return Ok();
+            return BadRequest(new { message = result.Message });
         }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+
+        return CreatedAtAction(nameof(GetDepartmentById), new { id = result.Data }, new { message = "Department created successfully." });
     }
     
     
     [HttpGet("departments/{id:int}")]
     public async Task<ActionResult<List<DepartmentDto>>> GetDepartmentById(int id)
     {
-        var query = new GetDepartmentByIdQueryRequest()
+        var query = new GetDepartmentByIdQueryRequest { Id = id };
+        var result = await _mediator.Send(query);
+        if (!result.Success)
         {
-            Id = id
-        };
-        var department = await _mediator.Send(query);
-        return Ok(department);
+            return NotFound(new { message = result.Message });
+        }
+
+        return Ok(result);
     }
     
     [HttpGet("departments")]
     public async Task<ActionResult<List<DepartmentDto>>> GetDepartments([FromQuery] GetAllDepartmentsQueryRequest request)
     {
-        var departments = await _mediator.Send(request);
-        return Ok(departments);
+        var result = await _mediator.Send(request);
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(result);
     }
     
     [HttpPut("departments/{id:int}")]
@@ -61,14 +66,26 @@ public class DepartmentController: ControllerBase
             return BadRequest("Mismatched Department ID");
         }
 
-        await _mediator.Send(command);
-        return NoContent(); 
+        var result = await _mediator.Send(command);
+        if (!result.Success)
+        {
+            return NotFound(new { message = result.Message });
+        }
+
+        return Ok(new { message = "Department updated successfully.", departmentId = result.Data });
     }
     
     [HttpDelete("departments/{id:int}")]
     public async Task<IActionResult> DeleteDepartment(int id)
     {
-        await _mediator.Send(new DeleteDepartmentByIdCommandRequest() { Id = id });
-        return NoContent();
+        var result = await _mediator.Send(new DeleteDepartmentByIdCommandRequest { Id = id });
+
+        if (!result.Success)
+        {
+            return NotFound(new { message = result.Message });
+        }
+
+        return Ok(new { message = "Department deleted successfully.", departmentId = result.Data });
     }
+
 }

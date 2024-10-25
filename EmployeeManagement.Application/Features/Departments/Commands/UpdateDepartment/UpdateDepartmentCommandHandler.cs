@@ -1,10 +1,11 @@
 using AutoMapper;
 using EmployeeManagement.Application.Interfaces.Repositories.Department;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Departments.Commands.UpdateDepartment;
 
-public class UpdateDepartmentCommandHandler: IRequestHandler<UpdateDepartmentCommandRequest>
+public class UpdateDepartmentCommandHandler: IRequestHandler<UpdateDepartmentCommandRequest, IDataResult<int>>
 {
     private readonly IDepartmentReadRepository _departmentReadRepository;
     private readonly IDepartmentWriteRepository _departmentWriteRepository;
@@ -17,14 +18,19 @@ public class UpdateDepartmentCommandHandler: IRequestHandler<UpdateDepartmentCom
         _mapper = mapper;
     }
 
-    public async Task Handle(UpdateDepartmentCommandRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<int>> Handle(UpdateDepartmentCommandRequest request, CancellationToken cancellationToken)
     {
         var department = await _departmentReadRepository.GetAsync(c => c.Id == request.Id);
-        _mapper.Map(request, department);
-        if (department is not null)
+        
+        if (department == null)
         {
-            _departmentWriteRepository.Update(department);
-            await _departmentWriteRepository.SaveChangeAsync();
+            return new ErrorDataResult<int>(0, "Department not found.");
         }
+
+        _mapper.Map(request, department);
+        _departmentWriteRepository.Update(department);
+        await _departmentWriteRepository.SaveChangeAsync();
+
+        return new SuccessDataResult<int>(department.Id, "Department updated successfully.");
     }
 }
