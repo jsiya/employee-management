@@ -4,6 +4,7 @@ using EmployeeManagement.Application.Features.Companies.Commands.DeleteCompanyBy
 using EmployeeManagement.Application.Features.Companies.Commands.UpdateCompanyById;
 using EmployeeManagement.Application.Features.Companies.Queries.GetAllCompanies;
 using EmployeeManagement.Application.Features.Companies.Queries.GetCompanyById;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,8 +24,14 @@ public class CompanyController: ControllerBase
     [HttpPost("companies")]
     public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyCommandRequest commandRequest)
     {
-        var companyId = await _mediator.Send(commandRequest);
-        return Ok();
+        var result = await _mediator.Send(commandRequest);
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new { companyId = result.Data, message = result.Message });
     }
     
     [HttpGet("companies")]
@@ -35,33 +42,55 @@ public class CompanyController: ControllerBase
             Page = page,
             PageSize = pageSize
         };
-        var companies = await _mediator.Send(query);
-        return Ok(companies);
+        var result = await _mediator.Send(query);
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
     }
     
     [HttpGet("companies/{id:int}")]
-    public async Task<ActionResult<List<CompanyDto>>> GetCompanies(int id)
+    public async Task<ActionResult<List<CompanyDto>>> GetCompanyById(int id)
     {
-        var query = new GetCompanyByIdQueryRequest()
+        var result = await _mediator.Send(new GetCompanyByIdQueryRequest { Id = id }) as IDataResult<CompanyDto>;
+
+        if (!result.Success)
         {
-            Id = id
-        };
-        var company = await _mediator.Send(query);
-        return Ok(company);
+            return NotFound(result);
+        }
+
+        return Ok(result);
     }
     
     [HttpPut("companies/{id:int}")]
     public async Task<IActionResult> UpdateCompany(int id, [FromBody] UpdateCompanyCommandRequest command)
     {
-        await _mediator.Send(command);
-        return NoContent(); 
+        if (id != command.Id)
+        {
+            return BadRequest(new { message = "Mismatched Company ID" });
+        }
+
+        var result = await _mediator.Send(command) as IDataResult<int>;
+
+        if (!result.Success)
+        {
+            return NotFound(result);
+        }
+
+        return Ok(new { message = "Company updated successfully", companyId = result.Data });
     }
     
     [HttpDelete("companies/{id:int}")]
     public async Task<IActionResult> DeleteCompany(int id)
     {
-        await _mediator.Send(new DeleteCompanyByIdCommandRequest() { Id = id });
-        return NoContent();
+        var result = await _mediator.Send(new DeleteCompanyByIdCommandRequest { Id = id });
+
+        if (!result.Success)
+        {
+            return NotFound(result);
+        }
+
+        return Ok(new { message = result.Message });
     }
     
 }

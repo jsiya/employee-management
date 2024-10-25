@@ -2,11 +2,12 @@ using AutoMapper;
 using EmployeeManagement.Application.DTOs.CompanyDTOs;
 using EmployeeManagement.Application.Features.Companies.Queries.GetAllCompanies;
 using EmployeeManagement.Application.Interfaces.Repositories.Company;
+using EmployeeManagement.Application.Utilities.Responses;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Companies.Queries.GetCompanyById;
 
-public class GetCompanyByIdQueryHandler: IRequestHandler<GetCompanyByIdQueryRequest, GetCompanyByIdQueryResponse>
+public class GetCompanyByIdQueryHandler: IRequestHandler<GetCompanyByIdQueryRequest, IDataResult<CompanyDto>>
 {
     private readonly ICompanyReadRepository _companyReadRepository;
     private readonly IMapper _mapper;
@@ -17,12 +18,15 @@ public class GetCompanyByIdQueryHandler: IRequestHandler<GetCompanyByIdQueryRequ
         _mapper = mapper;
     }
 
-    public async Task<GetCompanyByIdQueryResponse> Handle(GetCompanyByIdQueryRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<CompanyDto>> Handle(GetCompanyByIdQueryRequest request, CancellationToken cancellationToken)
     {
         var company = await _companyReadRepository.GetAsync(c => c.Id == request.Id);
-        return new GetCompanyByIdQueryResponse()
+        if (company == null)
         {
-            Company = _mapper.Map<CompanyDto>(company)
-        };
+            return new ErrorDataResult<CompanyDto>(null, "Company not found.");
+        }
+
+        var companyDto = _mapper.Map<CompanyDto>(company);
+        return new SuccessDataResult<CompanyDto>(companyDto, "Company retrieved successfully.");
     }
 }

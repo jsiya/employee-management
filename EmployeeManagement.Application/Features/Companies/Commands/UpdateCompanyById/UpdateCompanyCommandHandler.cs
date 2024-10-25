@@ -1,11 +1,12 @@
 using AutoMapper;
 using EmployeeManagement.Application.Interfaces.Repositories.Company;
+using EmployeeManagement.Application.Utilities.Responses;
 using EmployeeManagement.Domain.Entities.Concretes;
 using MediatR;
 
 namespace EmployeeManagement.Application.Features.Companies.Commands.UpdateCompanyById;
 
-public class UpdateCompanyCommandHandler: IRequestHandler<UpdateCompanyCommandRequest, int>
+public class UpdateCompanyCommandHandler: IRequestHandler<UpdateCompanyCommandRequest, IDataResult<int>>
 {
     private readonly ICompanyReadRepository _companyReadRepository;
     private readonly ICompanyWriteRepository _companyWriteRepository;
@@ -18,18 +19,19 @@ public class UpdateCompanyCommandHandler: IRequestHandler<UpdateCompanyCommandRe
         _mapper = mapper;
     }
 
-    public async Task<int> Handle(UpdateCompanyCommandRequest request, CancellationToken cancellationToken)
+    public async Task<IDataResult<int>> Handle(UpdateCompanyCommandRequest request, CancellationToken cancellationToken)
     {
         var company = await _companyReadRepository.GetAsync(c => c.Id == request.Id);
-        _mapper.Map(request, company);
-        if(company is not null)
+        
+        if (company == null)
         {
-            _companyWriteRepository.Update(company);
-            
-            await _companyWriteRepository.SaveChangeAsync();
-            return 1;
+            return new ErrorDataResult<int>(0, "Company not found.");
         }
 
-        return 0;
+        _mapper.Map(request, company);
+        _companyWriteRepository.Update(company);
+        await _companyWriteRepository.SaveChangeAsync();
+
+        return new SuccessDataResult<int>(company.Id, "Company updated successfully.");
     }
 }

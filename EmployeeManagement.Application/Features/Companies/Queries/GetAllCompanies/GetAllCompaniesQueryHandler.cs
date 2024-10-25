@@ -20,13 +20,17 @@ public class GetAllCompaniesQueryHandler: IRequestHandler<GetAllCompaniesQueryRe
     public async Task<GetAllCompaniesQueryResponse> Handle(GetAllCompaniesQueryRequest request, CancellationToken cancellationToken)
     {
         var companies = await _companyReadRepository.GetAllAsync();
+        var totalCount = companies.Count();
         var companiesForPage = companies.ToList()
             .Skip((request.Page-1) * request.PageSize)
             .Take(request.PageSize).ToList();
+        var companiesDtos = _mapper.Map<ICollection<CompanyDto>>(companiesForPage);
 
-        return new GetAllCompaniesQueryResponse()
-        {
-            Companies = _mapper.Map<ICollection<CompanyDto>>(companiesForPage)
-        };
+        return new GetAllCompaniesQueryResponse(
+            companiesDtos,
+            totalCount,
+            request.PageSize,
+            request.Page
+            );
     }
 }
